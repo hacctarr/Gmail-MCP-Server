@@ -623,13 +623,12 @@ async function main() {
                     // Extract email content using the recursive function
                     const { text, html } = extractEmailContent(response.data.payload as GmailMessagePart || {});
 
-                    // Use plain text content if available, otherwise use HTML content
-                    // (optionally, you could implement HTML-to-text conversion here)
-                    let body = text || html || '';
-
-                    // If we only have HTML content, add a note for the user
-                    const contentTypeNote = !text && html ?
-                        '[Note: This email is HTML-formatted. Plain text version not available.]\n\n' : '';
+                    // Prefer HTML content to preserve links and formatting for LLM consumption.
+                    // Many emails (meeting invites, newsletters, notifications) only have
+                    // meaningful content in HTML. Plain text versions often strip links,
+                    // tables, and formatting that LLMs can parse effectively.
+                    let body = html || text || '';
+                    const contentTypeNote = '';
 
                     // Get attachment information
                     const attachments: EmailAttachment[] = [];
